@@ -3,7 +3,7 @@
 	background: #23282d;
 	font-family: 'Ubuntu', sans-serif;
 	color: #fff;
-	border-left: 4px solid #2d76a6;
+	border-left: 4px solid #0f0;
 	display: inline-block;
 	position: relative;
 	padding-bottom: 1em;
@@ -42,7 +42,7 @@
 .bitpay-token__logo:after {
 	content: "Livenet";
 	display: inline;
-	color: #2d76a6;
+	color: #0f0;
 }
 .bitpay-token--testnet .bitpay-token__logo:after {
 	content: "Testnet";
