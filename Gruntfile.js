@@ -1,6 +1,6 @@
 /**
- * @license Copyright 2011-2014 BitPay Inc., MIT License 
- * see https://github.com/bitpay/woocommerce-plugin/blob/master/LICENSE
+ * @license Copyright 2016 PayB.ee, MIT License 
+ * see https://github.com/paybee/woocommerce-plugin/blob/master/LICENSE
  */
 
 'use strict';
@@ -68,7 +68,7 @@ module.exports = function(grunt) {
     cssmin: {
       build: {
         options: {
-          banner: '/**\n * @license Copyright 2011-2014 BitPay Inc., MIT License\n * see https://github.com/bitpay/woocommerce-plugin/blob/master/LICENSE\n */'
+          banner: '/**\n * @license Copyright 2016 PayB.ee Inc., MIT License\n * see https://github.com/paybee/woocommerce-plugin/blob/master/LICENSE\n */'
         },
         files: {
           'dist/bitpay-for-woocommerce/assets/css/style.css': ['src/assets/css/**.css']

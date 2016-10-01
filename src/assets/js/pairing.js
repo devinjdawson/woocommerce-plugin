@@ -1,5 +1,5 @@
 /**
- * @license Copyright 2011-2014 BitPay Inc., MIT License
+ * @license Copyright 2016 PayB.ee, MIT License
  * see https://github.com/bitpay/woocommerce-bitpay/blob/master/LICENSE
  */
 
@@ -28,7 +28,7 @@
     });
 
     /**
-     * Try to pair with BitPay using an entered pairing code
+     * Try to pair with PayB.ee using an entered pairing code
     */
     $('#bitpay_api_token_form').on('click', '.bitpay-pairing__find', function (e) {
 
@@ -39,7 +39,7 @@
       $('.bitpay-pairing').hide();
       $('.bitpay-pairing').after('<div class="bitpay-pairing__loading" style="width: 20em; text-align: center"><img src="'+ajax_loader_url+'"></div>');
 
-      // Attempt the pair with BitPay
+      // Attempt the pair with PayB.ee
       $.post(BitpayAjax.ajaxurl, {
         'action':       'bitpay_pair_code',
         'pairing_code': $('.bitpay-pairing__code').val(),
@@ -63,12 +63,12 @@
           $('.bitpay-pairing__code').val('');
           $('.bitpay-pairing__network').val('livenet');
           $('#message').remove();
-          $('h2.woo-nav-tab-wrapper').after('<div id="message" class="updated fade"><p><strong>You have been paired with your BitPay account!</strong></p></div>');
+          $('h2.woo-nav-tab-wrapper').after('<div id="message" class="updated fade"><p><strong>You have been paired with your PayB.ee account!</strong></p></div>');
         }
         // Pairing failed
         else if (data && data.success === false) {
           $('.bitpay-pairing').show();
-          alert('Unable to pair with BitPay.');
+          alert('Unable to pair with PayB.ee.');
         }
 
       });

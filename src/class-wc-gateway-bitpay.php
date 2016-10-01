@@ -1,15 +1,15 @@
 <?php
 /*
-    Plugin Name: BitPay for WooCommerce
-    Plugin URI:  https://bitpay.com
-    Description: Enable your WooCommerce store to accept Bitcoin with BitPay.
-    Author:      bitpay
-    Author URI:  https://bitpay.com
+    Plugin Name: PayB.ee for WooCommerce
+    Plugin URI:  https://PayB.ee
+    Description: Enable your WooCommerce store to accept Monero, Dogecoin Litecoin, and Bitcoin with PayB.ee.
+    Author:      PayBee
+    Author URI:  https://PayB.ee
 
     Version:           2.2.9
-    License:           Copyright 2011-2014 BitPay Inc., MIT License
-    License URI:       https://github.com/bitpay/woocommerce-plugin/blob/master/LICENSE
-    GitHub Plugin URI: https://github.com/bitpay/woocommerce-plugin
+    License:           Copyright 2016 PayB.ee, MIT License
+    License URI:       https://github.com/paybee/woocommerce-plugin/blob/master/LICENSE
+    GitHub Plugin URI: https://github.com/paybee/woocommerce-plugin
  */
 
 // Exit if accessed directly
@@ -19,14 +19,14 @@ if (false === defined('ABSPATH')) {
 
 $autoloader_param = __DIR__ . '/lib/Bitpay/Autoloader.php';
 
-// Load up the BitPay library
+// Load up the PayB.ee library
 if (true === file_exists($autoloader_param) &&
     true === is_readable($autoloader_param))
 {
     require_once $autoloader_param;
     \Bitpay\Autoloader::register();
 } else {
-    throw new \Exception('The BitPay payment plugin was not installed correctly or the files are corrupt. Please reinstall the plugin. If this message persists after a reinstall, contact support@bitpay.com with this message.');
+    throw new \Exception('The PayB.ee payment plugin was not installed correctly or the files are corrupt. Please reinstall the plugin. If this message persists after a reinstall, contact support@bitpay.com with this message.');
 }
 
 // Exist for quirks in object serialization...
@@ -42,7 +42,7 @@ if (false === class_exists('Token')) {
     include_once(__DIR__ . '/lib/Bitpay/Token.php');
 }
 
-// Ensures WooCommerce is loaded before initializing the BitPay plugin
+// Ensures WooCommerce is loaded before initializing the PayB.ee plugin
 add_action('plugins_loaded', 'woocommerce_bitpay_init', 0);
 register_activation_hook(__FILE__, 'woocommerce_bitpay_activate');
 
@@ -82,9 +82,9 @@ function woocommerce_bitpay_init()
             $this->id                 = 'bitpay';
             $this->icon               = plugin_dir_url(__FILE__).'assets/img/icon.png';
             $this->has_fields         = false;
-            $this->order_button_text  = __('Proceed to BitPay', 'bitpay');
-            $this->method_title       = 'BitPay';
-            $this->method_description = 'BitPay allows you to accept bitcoin payments on your WooCommerce store.';
+            $this->order_button_text  = __('Proceed to PayB.ee', 'bitpay');
+            $this->method_title       = 'PayB.ee';
+            $this->method_description = 'PayB.ee allows you to accept bitcoin payments on your WooCommerce store.';
 
             // Load the settings.
             $this->init_form_fields();
@@ -96,7 +96,7 @@ function woocommerce_bitpay_init()
             $this->order_states       = $this->get_option('order_states');
             $this->debug              = 'yes' === $this->get_option('debug', 'no');
 
-            // Define BitPay settings
+            // Define PayB.ee settings
             $this->api_key            = get_option('woocommerce_bitpay_key');
             $this->api_pub            = get_option('woocommerce_bitpay_pub');
             $this->api_sin            = get_option('woocommerce_bitpay_sin');
@@ -108,7 +108,7 @@ function woocommerce_bitpay_init()
             $this->debug_php_version    = PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;
             $this->debug_plugin_version = get_option('woocommerce_bitpay_version');
 
-            $this->log('BitPay Woocommerce payment plugin object constructor called. Plugin is v' . $this->debug_plugin_version . ' and server is PHP v' . $this->debug_php_version);
+            $this->log('PayB.ee Woocommerce payment plugin object constructor called. Plugin is v' . $this->debug_plugin_version . ' and server is PHP v' . $this->debug_php_version);
             $this->log('    [Info] $this->api_key            = ' . $this->api_key);
             $this->log('    [Info] $this->api_pub            = ' . $this->api_pub);
             $this->log('    [Info] $this->api_sin            = ' . $this->api_sin);
@@ -212,13 +212,13 @@ function woocommerce_bitpay_init()
                 return false;
             }
 
-            // Ensure the currency is supported by BitPay
+            // Ensure the currency is supported by PayB.ee
             try {
                 $currency = new \Bitpay\Currency(get_woocommerce_currency());
 
                 if (false === isset($currency) || true === empty($currency)) {
-                    $this->log('    [Error] The Bitpay payment plugin was called to check if it was valid for use but could not instantiate a currency object.');
-                    throw new \Exception('The Bitpay payment plugin was called to check if it was valid for use but could not instantiate a currency object. Cannot continue!');
+                    $this->log('    [Error] The PayB.ee payment plugin was called to check if it was valid for use but could not instantiate a currency object.');
+                    throw new \Exception('The PayB.ee payment plugin was called to check if it was valid for use but could not instantiate a currency object. Cannot continue!');
                 }
             } catch (\Exception $e) {
                 $this->log('    [Error] In is_valid_for_use: ' . $e->getMessage());
@@ -243,7 +243,7 @@ function woocommerce_bitpay_init()
                 'enabled' => array(
                     'title'   => __('Enable/Disable', 'bitpay'),
                     'type'    => 'checkbox',
-                    'label'   => __('Enable Bitcoin Payments via BitPay', 'bitpay'),
+                    'label'   => __('Enable Bitcoin Payments via PayB.ee', 'bitpay'),
                     'default' => 'yes'
                ),
                 'title' => array(
@@ -283,13 +283,13 @@ function woocommerce_bitpay_init()
                     'type'        => 'checkbox',
                     'label'       => sprintf(__('Enable logging <a href="%s" class="button">View Logs</a>', 'bitpay'), $logs_href),
                     'default'     => 'no',
-                    'description' => sprintf(__('Log BitPay events, such as IPN requests, inside <code>%s</code>', 'bitpay'), wc_get_log_file_path('bitpay')),
+                    'description' => sprintf(__('Log PayB.ee events, such as IPN requests, inside <code>%s</code>', 'bitpay'), wc_get_log_file_path('bitpay')),
                     'desc_tip'    => true,
                ),
                 'notification_url' => array(
                     'title'       => __('Notification URL', 'bitpay'),
                     'type'        => 'url',
-                    'description' => __('BitPay will send IPNs for orders to this URL with the BitPay invoice data', 'bitpay'),
+                    'description' => __('PayB.ee will send IPNs for orders to this URL with the PayB.ee invoice data', 'bitpay'),
                     'default'     => '',
                     'placeholder' => WC()->api_request_url('WC_Gateway_Bitpay'),
                     'desc_tip'    => true,
@@ -297,7 +297,7 @@ function woocommerce_bitpay_init()
                 'redirect_url' => array(
                     'title'       => __('Redirect URL', 'bitpay'),
                     'type'        => 'url',
-                    'description' => __('After paying the BitPay invoice, users will be redirected back to this URL', 'bitpay'),
+                    'description' => __('After paying the PayB.ee invoice, users will be redirected back to this URL', 'bitpay'),
                     'default'     => '',
                     'placeholder' => $this->get_return_url(),
                     'desc_tip'    => true,
@@ -305,7 +305,7 @@ function woocommerce_bitpay_init()
                 'support_details' => array(
 		            'title'       => __( 'Plugin & Support Information', 'bitpay' ),
 		            'type'        => 'title',
-		            'description' => sprintf(__('This plugin version is %s and your PHP version is %s. If you need assistance, please contact support@bitpay.com.  Thank you for using BitPay!', 'bitpay'), get_option('woocommerce_bitpay_version'), PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION),
+		            'description' => sprintf(__('This plugin version is %s and your PHP version is %s. If you need assistance, please contact support@bitpay.com.  Thank you for using PayB.ee!', 'bitpay'), get_option('woocommerce_bitpay_version'), PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION),
 	           ),
            );
 
@@ -555,15 +555,15 @@ function woocommerce_bitpay_init()
             $this->log('    [Info] Entered process_payment() with order_id = ' . $order_id . '...');
 
             if (true === empty($order_id)) {
-                $this->log('    [Error] The Bitpay payment plugin was called to process a payment but the order_id was missing.');
-                throw new \Exception('The Bitpay payment plugin was called to process a payment but the order_id was missing. Cannot continue!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process a payment but the order_id was missing.');
+                throw new \Exception('The PayB.ee payment plugin was called to process a payment but the order_id was missing. Cannot continue!');
             }
 
             $order = wc_get_order($order_id);
 
             if (false === $order) {
-                $this->log('    [Error] The Bitpay payment plugin was called to process a payment but could not retrieve the order details for order_id ' . $order_id);
-                throw new \Exception('The Bitpay payment plugin was called to process a payment but could not retrieve the order details for order_id ' . $order_id . '. Cannot continue!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process a payment but could not retrieve the order details for order_id ' . $order_id);
+                throw new \Exception('The PayB.ee payment plugin was called to process a payment but could not retrieve the order details for order_id ' . $order_id . '. Cannot continue!');
             }
 
             $notification_url = $this->get_option('notification_url', WC()->api_request_url('WC_Gateway_Bitpay'));
@@ -572,7 +572,7 @@ function woocommerce_bitpay_init()
             // Mark new order according to user settings (we're awaiting the payment)
             $new_order_states = $this->get_option('order_states');
             $new_order_status = $new_order_states['new'];
-            $order->update_status($new_order_status, 'Awaiting payment notification from BitPay.');
+            $order->update_status($new_order_status, 'Awaiting payment notification from PayB.ee.');
 
             $thanks_link = $this->get_return_url($order);
 
@@ -592,16 +592,16 @@ function woocommerce_bitpay_init()
             $currency = new \Bitpay\Currency($currency_code);
 
             if (false === isset($currency) && true === empty($currency)) {
-                $this->log('    [Error] The Bitpay payment plugin was called to process a payment but could not instantiate a Currency object.');
-                throw new \Exception('The Bitpay payment plugin was called to process a payment but could not instantiate a Currency object. Cannot continue!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process a payment but could not instantiate a Currency object.');
+                throw new \Exception('The PayB.ee payment plugin was called to process a payment but could not instantiate a Currency object. Cannot continue!');
             }
 
-            // Get a BitPay Client to prepare for invoice creation
+            // Get a PayB.ee Client to prepare for invoice creation
             $client = new \Bitpay\Client\Client();
 
             if (false === isset($client) && true === empty($client)) {
-                $this->log('    [Error] The Bitpay payment plugin was called to process a payment but could not instantiate a client object.');
-                throw new \Exception('The Bitpay payment plugin was called to process a payment but could not instantiate a client object. Cannot continue!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process a payment but could not instantiate a client object.');
+                throw new \Exception('The PayB.ee payment plugin was called to process a payment but could not instantiate a client object. Cannot continue!');
             }
 
             if ('livenet' === $this->api_network) {
@@ -615,8 +615,8 @@ function woocommerce_bitpay_init()
             $curlAdapter = new \Bitpay\Client\Adapter\CurlAdapter();
 
             if (false === isset($curlAdapter) || true === empty($curlAdapter)) {
-                $this->log('    [Error] The Bitpay payment plugin was called to process a payment but could not instantiate a CurlAdapter object.');
-                throw new \Exception('The Bitpay payment plugin was called to process a payment but could not instantiate a CurlAdapter object. Cannot continue!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process a payment but could not instantiate a CurlAdapter object.');
+                throw new \Exception('The PayB.ee payment plugin was called to process a payment but could not instantiate a CurlAdapter object. Cannot continue!');
             }
 
             $client->setAdapter($curlAdapter);
@@ -624,22 +624,22 @@ function woocommerce_bitpay_init()
             if (false === empty($this->api_key)) {
                 $client->setPrivateKey($this->api_key);
             } else {
-                $this->log('    [Error] The Bitpay payment plugin was called to process a payment but could not set client->setPrivateKey to this->api_key. The empty() check failed!');
-                throw new \Exception(' The Bitpay payment plugin was called to process a payment but could not set client->setPrivateKey to this->api_key. The empty() check failed!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process a payment but could not set client->setPrivateKey to this->api_key. The empty() check failed!');
+                throw new \Exception(' The PayB.ee payment plugin was called to process a payment but could not set client->setPrivateKey to this->api_key. The empty() check failed!');
             }
 
             if (false === empty($this->api_pub)) {
                 $client->setPublicKey($this->api_pub);
             } else {
-                $this->log('    [Error] The Bitpay payment plugin was called to process a payment but could not set client->setPublicKey to this->api_pub. The empty() check failed!');
-                throw new \Exception(' The Bitpay payment plugin was called to process a payment but could not set client->setPublicKey to this->api_pub. The empty() check failed!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process a payment but could not set client->setPublicKey to this->api_pub. The empty() check failed!');
+                throw new \Exception(' The PayB.ee payment plugin was called to process a payment but could not set client->setPublicKey to this->api_pub. The empty() check failed!');
             }
 
             if (false === empty($this->api_token)) {
                 $client->setToken($this->api_token);
             } else {
-                $this->log('    [Error] The Bitpay payment plugin was called to process a payment but could not set client->setToken to this->api_token. The empty() check failed!');
-                throw new \Exception(' The Bitpay payment plugin was called to process a payment but could not set client->setToken to this->api_token. The empty() check failed!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process a payment but could not set client->setToken to this->api_token. The empty() check failed!');
+                throw new \Exception(' The PayB.ee payment plugin was called to process a payment but could not set client->setToken to this->api_token. The empty() check failed!');
             }
 
             $this->log('    [Info] Key and token empty checks passed.  Parameters in client set accordingly...');
@@ -648,8 +648,8 @@ function woocommerce_bitpay_init()
             $invoice = new \Bitpay\Invoice();
 
             if (false === isset($invoice) || true === empty($invoice)) {
-                $this->log('    [Error] The Bitpay payment plugin was called to process a payment but could not instantiate an Invoice object.');
-                throw new \Exception('The Bitpay payment plugin was called to process a payment but could not instantiate an Invoice object. Cannot continue!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process a payment but could not instantiate an Invoice object.');
+                throw new \Exception('The PayB.ee payment plugin was called to process a payment but could not instantiate an Invoice object. Cannot continue!');
             } else {
                 $this->log('    [Info] Invoice object created successfully...');
             }
@@ -663,8 +663,8 @@ function woocommerce_bitpay_init()
             $item = new \Bitpay\Item();
 
             if (false === isset($item) || true === empty($item)) {
-                $this->log('    [Error] The Bitpay payment plugin was called to process a payment but could not instantiate an item object.');
-                throw new \Exception('The Bitpay payment plugin was called to process a payment but could not instantiate an item object. Cannot continue!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process a payment but could not instantiate an item object.');
+                throw new \Exception('The PayB.ee payment plugin was called to process a payment but could not instantiate an item object. Cannot continue!');
             } else {
                 $this->log('    [Info] Item object created successfully...');
             }
@@ -673,8 +673,8 @@ function woocommerce_bitpay_init()
             if (true === isset($order_total) && false === empty($order_total)) {
                 $item->setPrice($order_total);
             } else {
-                $this->log('    [Error] The Bitpay payment plugin was called to process a payment but could not set item->setPrice to $order->calculate_totals(). The empty() check failed!');
-                throw new \Exception('The Bitpay payment plugin was called to process a payment but could not set item->setPrice to $order->calculate_totals(). The empty() check failed!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process a payment but could not set item->setPrice to $order->calculate_totals(). The empty() check failed!');
+                throw new \Exception('The PayB.ee payment plugin was called to process a payment but could not set item->setPrice to $order->calculate_totals(). The empty() check failed!');
             }
 
             $invoice->setItem($item);
@@ -690,8 +690,8 @@ function woocommerce_bitpay_init()
                 $invoice = $client->createInvoice($invoice);
 
                 if (false === isset($invoice) || true === empty($invoice)) {
-                    $this->log('    [Error] The Bitpay payment plugin was called to process a payment but could not instantiate an invoice object.');
-                    throw new \Exception('The Bitpay payment plugin was called to process a payment but could not instantiate an invoice object. Cannot continue!');
+                    $this->log('    [Error] The PayB.ee payment plugin was called to process a payment but could not instantiate an invoice object.');
+                    throw new \Exception('The PayB.ee payment plugin was called to process a payment but could not instantiate an invoice object. Cannot continue!');
                 } else {
                     $this->log('    [Info] Call to generate invoice was successful: ' . $client->getResponse()->getBody());
                 }
@@ -701,7 +701,7 @@ function woocommerce_bitpay_init()
 
                 return array(
                     'result'    => 'success',
-                    'messages'  => 'Sorry, but Bitcoin checkout with BitPay does not appear to be working.'
+                    'messages'  => 'Sorry, but Bitcoin checkout with PayB.ee does not appear to be working.'
                 );
             }
 
@@ -713,7 +713,7 @@ function woocommerce_bitpay_init()
 
             $this->log('    [Info] Leaving process_payment()...');
 
-            // Redirect the customer to the BitPay invoice
+            // Redirect the customer to the PayB.ee invoice
             return array(
                 'result'   => 'success',
                 'redirect' => $invoice->getUrl(),
@@ -729,7 +729,7 @@ function woocommerce_bitpay_init()
 
             if (true === empty($post)) {
                 $this->log('    [Error] No post data sent to IPN handler!');
-                error_log('[Error] BitPay plugin received empty POST data for an IPN message.');
+                error_log('[Error] PayB.ee plugin received empty POST data for an IPN message.');
 
                 wp_die('No post data');
             } else {
@@ -740,7 +740,7 @@ function woocommerce_bitpay_init()
 
             if (true === empty($json)) {
                 $this->log('    [Error] Invalid JSON payload sent to IPN handler: ' . $post);
-                error_log('[Error] BitPay plugin received an invalid JSON payload sent to IPN handler: ' . $post);
+                error_log('[Error] PayB.ee plugin received an invalid JSON payload sent to IPN handler: ' . $post);
 
                 wp_die('Invalid JSON');
             } else {
@@ -749,7 +749,7 @@ function woocommerce_bitpay_init()
 
             if (false === array_key_exists('id', $json)) {
                 $this->log('    [Error] No invoice ID present in JSON payload: ' . var_export($json, true));
-                error_log('[Error] BitPay plugin did not receive an invoice ID present in JSON payload: ' . var_export($json, true));
+                error_log('[Error] PayB.ee plugin did not receive an invoice ID present in JSON payload: ' . var_export($json, true));
 
                 wp_die('No Invoice ID');
             } else {
@@ -758,19 +758,19 @@ function woocommerce_bitpay_init()
 
             if (false === array_key_exists('url', $json)) {
                 $this->log('    [Error] No invoice URL present in JSON payload: ' . var_export($json, true));
-                error_log('[Error] BitPay plugin did not receive an invoice URL present in JSON payload: ' . var_export($json, true));
+                error_log('[Error] PayB.ee plugin did not receive an invoice URL present in JSON payload: ' . var_export($json, true));
 
                 wp_die('No Invoice URL');
             } else {
                 $this->log('    [Info] Invoice URL present in JSON payload...');
             }
 
-            // Get a BitPay Client to prepare for invoice fetching
+            // Get a PayB.ee Client to prepare for invoice fetching
             $client = new \Bitpay\Client\Client();
 
             if (false === isset($client) && true === empty($client)) {
-                $this->log('    [Error] The Bitpay payment plugin was called to handle an IPN but could not instantiate a client object.');
-                throw new \Exception('The Bitpay payment plugin was called to handle an IPN but could not instantiate a client object. Cannot continue!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to handle an IPN but could not instantiate a client object.');
+                throw new \Exception('The PayB.ee payment plugin was called to handle an IPN but could not instantiate a client object. Cannot continue!');
             } else {
                 $this->log('    [Info] Created new Client object in IPN handler...');
             }
@@ -790,39 +790,39 @@ function woocommerce_bitpay_init()
             $curlAdapter = new \Bitpay\Client\Adapter\CurlAdapter();
 
             if (false === isset($curlAdapter) && true === empty($curlAdapter)) {
-                $this->log('    [Error] The Bitpay payment plugin was called to handle an IPN but could not instantiate a CurlAdapter object.');
-                throw new \Exception('The Bitpay payment plugin was called to handle an IPN but could not instantiate a CurlAdapter object. Cannot continue!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to handle an IPN but could not instantiate a CurlAdapter object.');
+                throw new \Exception('The PayB.ee payment plugin was called to handle an IPN but could not instantiate a CurlAdapter object. Cannot continue!');
             } else {
                 $this->log('    [Info] Created new CurlAdapter object in IPN handler...');
             }
 
-            // Setting the Adapter param to a new BitPay CurlAdapter object
+            // Setting the Adapter param to a new PayB.ee CurlAdapter object
             $client->setAdapter($curlAdapter);
 
             if (false === empty($this->api_key)) {
                 $client->setPrivateKey($this->api_key);
             } else {
-                $this->log('    [Error] The Bitpay payment plugin was called to handle an IPN but could not set client->setPrivateKey to this->api_key. The empty() check failed!');
-                throw new \Exception('The Bitpay payment plugin was called to handle an IPN but could not set client->setPrivateKey to this->api_key. The empty() check failed!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to handle an IPN but could not set client->setPrivateKey to this->api_key. The empty() check failed!');
+                throw new \Exception('The PayB.ee payment plugin was called to handle an IPN but could not set client->setPrivateKey to this->api_key. The empty() check failed!');
             }
 
             if (false === empty($this->api_pub)) {
                 $client->setPublicKey($this->api_pub);
             } else {
-                $this->log('    [Error] The Bitpay payment plugin was called to handle an IPN but could not set client->setPublicKey to this->api_pub. The empty() check failed!');
-                throw new \Exception('The Bitpay payment plugin was called to handle an IPN but could not set client->setPublicKey to this->api_pub. The empty() check failed!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to handle an IPN but could not set client->setPublicKey to this->api_pub. The empty() check failed!');
+                throw new \Exception('The PayB.ee payment plugin was called to handle an IPN but could not set client->setPublicKey to this->api_pub. The empty() check failed!');
             }
 
             if (false === empty($this->api_token)) {
                 $client->setToken($this->api_token);
             } else {
-                $this->log('    [Error] The Bitpay payment plugin was called to handle an IPN but could not set client->setToken to this->api_token. The empty() check failed!');
-                throw new \Exception('The Bitpay payment plugin was called to handle an IPN but could not set client->setToken to this->api_token. The empty() check failed!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to handle an IPN but could not set client->setToken to this->api_token. The empty() check failed!');
+                throw new \Exception('The PayB.ee payment plugin was called to handle an IPN but could not set client->setToken to this->api_token. The empty() check failed!');
             }
 
             $this->log('    [Info] Key and token empty checks passed.  Parameters in client set accordingly...');
 
-            // Fetch the invoice from BitPay's server to update the order
+            // Fetch the invoice from PayB.ee's server to update the order
             try {
                 $invoice = $client->getInvoice($json['id']);
 
@@ -843,8 +843,8 @@ function woocommerce_bitpay_init()
             $order_id = $invoice->getOrderId();
 
             if (false === isset($order_id) && true === empty($order_id)) {
-                $this->log('    [Error] The Bitpay payment plugin was called to process an IPN message but could not obtain the order ID from the invoice.');
-                throw new \Exception('The Bitpay payment plugin was called to process an IPN message but could not obtain the order ID from the invoice. Cannot continue!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process an IPN message but could not obtain the order ID from the invoice.');
+                throw new \Exception('The PayB.ee payment plugin was called to process an IPN message but could not obtain the order ID from the invoice. Cannot continue!');
             } else {
                 $this->log('    [Info] Order ID is: ' . $order_id);
             }
@@ -856,8 +856,8 @@ function woocommerce_bitpay_init()
             $order = wc_get_order($order_id);
 
             if (false === $order || 'WC_Order' !== get_class($order)) {
-                $this->log('    [Error] The Bitpay payment plugin was called to process an IPN message but could not retrieve the order details for order_id: "' . $order_id . '". If you use an alternative order numbering system, please see class-wc-gateway-bitpay.php to apply a search filter.');
-                throw new \Exception('The Bitpay payment plugin was called to process an IPN message but could not retrieve the order details for order_id ' . $order_id . '. Cannot continue!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process an IPN message but could not retrieve the order details for order_id: "' . $order_id . '". If you use an alternative order numbering system, please see class-wc-gateway-bitpay.php to apply a search filter.');
+                throw new \Exception('The PayB.ee payment plugin was called to process an IPN message but could not retrieve the order details for order_id ' . $order_id . '. Cannot continue!');
             } else {
                 $this->log('    [Info] Order details retrieved successfully...');
             }
@@ -865,8 +865,8 @@ function woocommerce_bitpay_init()
             $current_status = $order->get_status();
 
             if (false === isset($current_status) && true === empty($current_status)) {
-                $this->log('    [Error] The Bitpay payment plugin was called to process an IPN message but could not obtain the current status from the order.');
-                throw new \Exception('The Bitpay payment plugin was called to process an IPN message but could not obtain the current status from the order. Cannot continue!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process an IPN message but could not obtain the current status from the order.');
+                throw new \Exception('The PayB.ee payment plugin was called to process an IPN message but could not obtain the current status from the order. Cannot continue!');
             } else {
                 $this->log('    [Info] The current order status for this order is ' . $current_status);
             }
@@ -882,8 +882,8 @@ function woocommerce_bitpay_init()
             $checkStatus = $invoice->getStatus();
 
             if (false === isset($checkStatus) && true === empty($checkStatus)) {
-                $this->log('    [Error] The Bitpay payment plugin was called to process an IPN message but could not obtain the current status from the invoice.');
-                throw new \Exception('The Bitpay payment plugin was called to process an IPN message but could not obtain the current status from the invoice. Cannot continue!');
+                $this->log('    [Error] The PayB.ee payment plugin was called to process an IPN message but could not obtain the current status from the invoice.');
+                throw new \Exception('The PayB.ee payment plugin was called to process an IPN message but could not obtain the current status from the invoice. Cannot continue!');
             } else {
                 $this->log('    [Info] The current order status for this invoice is ' . $checkStatus);
             }
@@ -893,7 +893,7 @@ function woocommerce_bitpay_init()
             switch ($checkStatus) {
 
                 // The "paid" IPN message is received almost
-                // immediately after the BitPay invoice is paid.
+                // immediately after the PayB.ee invoice is paid.
                 case 'paid':
 
                     $this->log('    [Info] IPN response is a "paid" message.');
@@ -909,7 +909,7 @@ function woocommerce_bitpay_init()
                         $this->log('    [Info] This order has not been updated yet so setting new status...');
 
                         $order->update_status($paid_status);
-                        $order->add_order_note(__('BitPay invoice paid. Awaiting network confirmation and payment completed status.', 'bitpay'));
+                        $order->add_order_note(__('PayB.ee invoice paid. Awaiting network confirmation and payment completed status.', 'bitpay'));
                     }
 
                     break;
@@ -931,7 +931,7 @@ function woocommerce_bitpay_init()
                         $this->log('    [Info] This order has not been updated yet so setting confirmed status...');
 
                         $order->update_status($confirmed_status);
-                        $order->add_order_note(__('BitPay invoice confirmed. Awaiting payment completed status.', 'bitpay'));
+                        $order->add_order_note(__('PayB.ee invoice confirmed. Awaiting payment completed status.', 'bitpay'));
                     }
 
                     break;
@@ -954,7 +954,7 @@ function woocommerce_bitpay_init()
 
                         $order->payment_complete();
                         $order->update_status($complete_status);
-                        $order->add_order_note(__('BitPay invoice payment completed. Payment credited to your merchant account.', 'bitpay'));
+                        $order->add_order_note(__('PayB.ee invoice payment completed. Payment credited to your merchant account.', 'bitpay'));
                     }
 
                     break;
@@ -1007,7 +1007,7 @@ function woocommerce_bitpay_init()
         public function bitpay_encrypt($data)
         {
             if (false === isset($data) || true === empty($data)) {
-                throw new \Exception('The Bitpay payment plugin was called to encrypt data but no data was passed!');
+                throw new \Exception('The PayB.ee payment plugin was called to encrypt data but no data was passed!');
             }
 
             $this->log('    [Info] Entered bitpay_encrypt...');
@@ -1022,13 +1022,13 @@ function woocommerce_bitpay_init()
                 $fingerprint = substr($fingerprint, 0, 24);
 
                 if (false === isset($fingerprint) || true === empty($fingerprint)) {
-                    throw new \Exception('The Bitpay payment plugin was called to encrypt data but could not generate a fingerprint parameter!');
+                    throw new \Exception('The PayB.ee payment plugin was called to encrypt data but could not generate a fingerprint parameter!');
                 }
 
                 $encrypted = $mcrypt_ext->encrypt(base64_encode(serialize($data)), $fingerprint, '00000000');
 
                 if (true === empty($encrypted)) {
-                    throw new \Exception('The Bitpay payment plugin was called to encrypt a serialized object and failed!');
+                    throw new \Exception('The PayB.ee payment plugin was called to encrypt a serialized object and failed!');
                 }
 
                 $this->log('    [Info] Leaving class level bitpay_encrypt...');
@@ -1043,7 +1043,7 @@ function woocommerce_bitpay_init()
         public function bitpay_decrypt($encrypted)
         {
             if (false === isset($encrypted) || true === empty($encrypted)) {
-                throw new \Exception('The Bitpay payment plugin was called to decrypt data but no data was passed!');
+                throw new \Exception('The PayB.ee payment plugin was called to decrypt data but no data was passed!');
             }
 
             $this->log('    [Info] Entered class level bitpay_decrypt...');
@@ -1058,7 +1058,7 @@ function woocommerce_bitpay_init()
                 $fingerprint = substr($fingerprint, 0, 24);
 
                 if (false === isset($fingerprint) || true === empty($fingerprint)) {
-                    throw new \Exception('The Bitpay payment plugin was called to decrypt data but could not generate a fingerprint parameter!');
+                    throw new \Exception('The PayB.ee payment plugin was called to decrypt data but could not generate a fingerprint parameter!');
                 }
 
                 $decrypted = base64_decode($mcrypt_ext->decrypt($encrypted, $fingerprint, '00000000'));
@@ -1071,7 +1071,7 @@ function woocommerce_bitpay_init()
                 }
 
                 if (true === empty($decrypted)) {
-                    throw new \Exception('The Bitpay payment plugin was called to unserialize a decrypted object and failed! The decrypt function was called with "' . $encrypted . '"');
+                    throw new \Exception('The PayB.ee payment plugin was called to unserialize a decrypted object and failed! The decrypt function was called with "' . $encrypted . '"');
                 }
 
                 $this->log('    [Info] Leaving class level bitpay_decrypt...');
@@ -1085,7 +1085,7 @@ function woocommerce_bitpay_init()
     }
 
     /**
-    * Add BitPay Payment Gateway to WooCommerce
+    * Add PayB.ee Payment Gateway to WooCommerce
     **/
     function wc_add_bitpay($methods)
     {
@@ -1153,7 +1153,7 @@ function woocommerce_bitpay_init()
             $key = new \Bitpay\PrivateKey();
 
             if (true === empty($key)) {
-                throw new \Exception('The Bitpay payment plugin was called to process a pairing code but could not instantiate a PrivateKey object. Cannot continue!');
+                throw new \Exception('The PayB.ee payment plugin was called to process a pairing code but could not instantiate a PrivateKey object. Cannot continue!');
             }
 
             $key->generate();
@@ -1162,7 +1162,7 @@ function woocommerce_bitpay_init()
             $pub = new \Bitpay\PublicKey();
 
             if (true === empty($pub)) {
-                throw new \Exception('The Bitpay payment plugin was called to process a pairing code but could not instantiate a PublicKey object. Cannot continue!');
+                throw new \Exception('The PayB.ee payment plugin was called to process a pairing code but could not instantiate a PublicKey object. Cannot continue!');
             }
 
             $pub->setPrivateKey($key);
@@ -1172,7 +1172,7 @@ function woocommerce_bitpay_init()
             $sin = new \Bitpay\SinKey();
 
             if (true === empty($sin)) {
-                throw new \Exception('The Bitpay payment plugin was called to process a pairing code but could not instantiate a SinKey object. Cannot continue!');
+                throw new \Exception('The PayB.ee payment plugin was called to process a pairing code but could not instantiate a SinKey object. Cannot continue!');
             }
 
             $sin->setPublicKey($pub);
@@ -1182,7 +1182,7 @@ function woocommerce_bitpay_init()
             $client = new \Bitpay\Client\Client();
 
             if (true === empty($client)) {
-                throw new \Exception('The Bitpay payment plugin was called to process a pairing code but could not instantiate a Client object. Cannot continue!');
+                throw new \Exception('The PayB.ee payment plugin was called to process a pairing code but could not instantiate a Client object. Cannot continue!');
             }
 
             if ($network === 'livenet') {
@@ -1194,7 +1194,7 @@ function woocommerce_bitpay_init()
             $curlAdapter = new \Bitpay\Client\Adapter\CurlAdapter();
 
             if (true === empty($curlAdapter)) {
-                throw new \Exception('The Bitpay payment plugin was called to process a pairing code but could not instantiate a CurlAdapter object. Cannot continue!');
+                throw new \Exception('The PayB.ee payment plugin was called to process a pairing code but could not instantiate a CurlAdapter object. Cannot continue!');
             }
 
             $client->setAdapter($curlAdapter);
@@ -1254,7 +1254,7 @@ function woocommerce_bitpay_init()
     function bitpay_encrypt($data)
     {
         if (false === isset($data) || true === empty($data)) {
-            throw new \Exception('The Bitpay payment plugin was called to encrypt data but no data was passed!');
+            throw new \Exception('The PayB.ee payment plugin was called to encrypt data but no data was passed!');
         }
 
         $mcrypt_ext = new \Bitpay\Crypto\McryptExtension();
@@ -1267,13 +1267,13 @@ function woocommerce_bitpay_init()
             $fingerprint = substr($fingerprint, 0, 24);
 
             if (false === isset($fingerprint) || true === empty($fingerprint)) {
-                throw new \Exception('The Bitpay payment plugin was called to encrypt data but could not generate a fingerprint parameter!');
+                throw new \Exception('The PayB.ee payment plugin was called to encrypt data but could not generate a fingerprint parameter!');
             }
 
             $encrypted = $mcrypt_ext->encrypt(base64_encode(serialize($data)), $fingerprint, '00000000');
 
             if (true === empty($encrypted)) {
-                throw new \Exception('The Bitpay payment plugin was called to serialize an encrypted object and failed!');
+                throw new \Exception('The PayB.ee payment plugin was called to serialize an encrypted object and failed!');
             }
 
             return $encrypted;
@@ -1285,7 +1285,7 @@ function woocommerce_bitpay_init()
     function bitpay_decrypt($encrypted)
     {
         if (false === isset($encrypted) || true === empty($encrypted)) {
-            throw new \Exception('The Bitpay payment plugin was called to decrypt data but no data was passed!');
+            throw new \Exception('The PayB.ee payment plugin was called to decrypt data but no data was passed!');
         }
 
         $mcrypt_ext = new \Bitpay\Crypto\McryptExtension();
@@ -1298,7 +1298,7 @@ function woocommerce_bitpay_init()
             $fingerprint = substr($fingerprint, 0, 24);
 
             if (false === isset($fingerprint) || true === empty($fingerprint)) {
-                throw new \Exception('The Bitpay payment plugin was called to decrypt data but could not generate a fingerprint parameter!');
+                throw new \Exception('The PayB.ee payment plugin was called to decrypt data but could not generate a fingerprint parameter!');
             }
 
             $decrypted = base64_decode($mcrypt_ext->decrypt($encrypted, $fingerprint, '00000000'));
@@ -1311,7 +1311,7 @@ function woocommerce_bitpay_init()
             }
 
             if (true === empty($decrypted)) {
-                throw new \Exception('The Bitpay payment plugin was called to unserialize a decrypted object and failed! The decrypt function was called with "' . $encrypted . '"');
+                throw new \Exception('The PayB.ee payment plugin was called to unserialize a decrypted object and failed! The decrypt function was called with "' . $encrypted . '"');
             }
 
             return unserialize($decrypted);
@@ -1331,29 +1331,29 @@ function woocommerce_bitpay_failed_requirements()
 
     // PHP 5.4+ required
     if (true === version_compare(PHP_VERSION, '5.4.0', '<')) {
-        $errors[] = 'Your PHP version is too old. The BitPay payment plugin requires PHP 5.4 or higher to function. Please contact your web server administrator for assistance.';
+        $errors[] = 'Your PHP version is too old. The PayB.ee payment plugin requires PHP 5.4 or higher to function. Please contact your web server administrator for assistance.';
     }
 
     // Wordpress 3.9+ required
     if (true === version_compare($wp_version, '3.9', '<')) {
-        $errors[] = 'Your WordPress version is too old. The BitPay payment plugin requires Wordpress 3.9 or higher to function. Please contact your web server administrator for assistance.';
+        $errors[] = 'Your WordPress version is too old. The PayB.ee payment plugin requires Wordpress 3.9 or higher to function. Please contact your web server administrator for assistance.';
     }
 
     // WooCommerce required
     if (true === empty($woocommerce)) {
         $errors[] = 'The WooCommerce plugin for WordPress needs to be installed and activated. Please contact your web server administrator for assistance.';
     }elseif (true === version_compare($woocommerce->version, '2.2', '<')) {
-        $errors[] = 'Your WooCommerce version is too old. The BitPay payment plugin requires WooCommerce 2.2 or higher to function. Your version is '.$woocommerce->version.'. Please contact your web server administrator for assistance.';
+        $errors[] = 'Your WooCommerce version is too old. The PayB.ee payment plugin requires WooCommerce 2.2 or higher to function. Your version is '.$woocommerce->version.'. Please contact your web server administrator for assistance.';
     }
 
     // GMP or BCMath required
     if (false === extension_loaded('gmp') && false === extension_loaded('bcmath')) {
-        $errors[] = 'The BitPay payment plugin requires the GMP or BC Math extension for PHP in order to function. Please contact your web server administrator for assistance.';
+        $errors[] = 'The PayB.ee payment plugin requires the GMP or BC Math extension for PHP in order to function. Please contact your web server administrator for assistance.';
     }
 
     // Curl required
     if (false === extension_loaded('curl')) {
-        $errors[] = 'The BitPay payment plugin requires the Curl extension for PHP in order to function. Please contact your web server administrator for assistance.';
+        $errors[] = 'The PayB.ee payment plugin requires the Curl extension for PHP in order to function. Please contact your web server administrator for assistance.';
     }
 
     if (false === empty($errors)) {
@@ -1379,9 +1379,9 @@ function woocommerce_bitpay_activate()
         $plugins = get_plugins();
 
         foreach ($plugins as $file => $plugin) {
-            if ('Bitpay Woocommerce' === $plugin['Name'] && true === is_plugin_active($file)) {
+            if ('PayB.ee Woocommerce' === $plugin['Name'] && true === is_plugin_active($file)) {
                 deactivate_plugins(plugin_basename(__FILE__));
-                wp_die('BitPay for WooCommerce requires that the old plugin, <b>Bitpay Woocommerce</b>, is deactivated and deleted.<br><a href="'.$plugins_url.'">Return to plugins screen</a>');
+                wp_die('PayB.ee for WooCommerce requires that the old plugin, <b>Payb.ee Woocommerce</b>, is deactivated and deleted.<br><a href="'.$plugins_url.'">Return to plugins screen</a>');
 
             }
         }
