@@ -6,7 +6,7 @@
     Author:      PayBee
     Author URI:  https://PayB.ee
 
-    Version:           .1
+    Version:           3
     License:           Copyright 2016 PayB.ee, MIT License
     License URI:       https://github.com/paybee/woocommerce-plugin/blob/master/LICENSE
     GitHub Plugin URI: https://github.com/paybee/woocommerce-plugin
@@ -26,7 +26,7 @@ if (true === file_exists($autoloader_param) &&
     require_once $autoloader_param;
     \Bitpay\Autoloader::register();
 } else {
-    throw new \Exception('The PayB.ee payment plugin was not installed correctly or the files are corrupt. Please reinstall the plugin. If this message persists after a reinstall, contact support@bitpay.com with this message.');
+    throw new \Exception('The PayB.ee payment plugin was not installed correctly or the files are corrupt. Please reinstall the plugin. If this message persists after a reinstall, contact support@PayB.ee with this message.');
 }
 
 // Exist for quirks in object serialization...
@@ -84,7 +84,7 @@ function woocommerce_bitpay_init()
             $this->has_fields         = false;
             $this->order_button_text  = __('Proceed to PayB.ee', 'bitpay');
             $this->method_title       = 'PayB.ee';
-            $this->method_description = 'PayB.ee allows you to accept bitcoin payments on your WooCommerce store.';
+            $this->method_description = 'PayB.ee allows you to accept Monero, Dogecoin, Litecoin, and Bitcoin payments on your WooCommerce store.';
 
             // Load the settings.
             $this->init_form_fields();
@@ -243,21 +243,21 @@ function woocommerce_bitpay_init()
                 'enabled' => array(
                     'title'   => __('Enable/Disable', 'bitpay'),
                     'type'    => 'checkbox',
-                    'label'   => __('Enable Bitcoin Payments via PayB.ee', 'bitpay'),
+                    'label'   => __('Enable Virtual Currency Payments via PayB.ee', 'bitpay'),
                     'default' => 'yes'
                ),
                 'title' => array(
                     'title'       => __('Title', 'bitpay'),
                     'type'        => 'text',
                     'description' => __('Controls the name of this payment method as displayed to the customer during checkout.', 'bitpay'),
-                    'default'     => __('Bitcoin', 'bitpay'),
+                    'default'     => __('PayB.ee', 'bitpay'),
                     'desc_tip'    => true,
                ),
                 'description' => array(
                     'title'       => __('Customer Message', 'bitpay'),
                     'type'        => 'textarea',
                     'description' => __('Message to explain how the customer will be paying for the purchase.', 'bitpay'),
-                    'default'     => 'You will be redirected to bitpay.com to complete your purchase.',
+                    'default'     => 'You will be redirected to PayB.ee to complete your purchase.',
                     'desc_tip'    => true,
                ),
                 'api_token' => array(
@@ -266,7 +266,7 @@ function woocommerce_bitpay_init()
                 'transaction_speed' => array(
                     'title'       => __('Risk/Speed', 'bitpay'),
                     'type'        => 'select',
-                    'description' => 'Choose a transaction speed.  For details, see the API documentation at bitpay.com',
+                    'description' => 'Choose a transaction speed.  For details, see the API documentation at PayB.ee',
                     'options'     => array(
                         'high'    => 'High',
                         'medium'  => 'Medium',
@@ -305,7 +305,7 @@ function woocommerce_bitpay_init()
                 'support_details' => array(
 		            'title'       => __( 'Plugin & Support Information', 'bitpay' ),
 		            'type'        => 'title',
-		            'description' => sprintf(__('This plugin version is %s and your PHP version is %s. If you need assistance, please contact support@bitpay.com.  Thank you for using PayB.ee!', 'bitpay'), get_option('woocommerce_bitpay_version'), PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION),
+		            'description' => sprintf(__('This plugin version is %s and your PHP version is %s. If you need assistance, please contact support@PayB.ee.  Thank you for using PayB.ee!', 'bitpay'), get_option('woocommerce_bitpay_version'), PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION),
 	           ),
            );
 
@@ -701,7 +701,7 @@ function woocommerce_bitpay_init()
 
                 return array(
                     'result'    => 'success',
-                    'messages'  => 'Sorry, but Bitcoin checkout with PayB.ee does not appear to be working.'
+                    'messages'  => 'Sorry, but checkout with PayB.ee does not appear to be working.'
                 );
             }
 
@@ -976,7 +976,7 @@ function woocommerce_bitpay_init()
                     } else {
                         $this->log('    [Info] This order has a problem so setting "invalid" status...');
 
-                        $order->update_status($invalid_status, __('Bitcoin payment is invalid for this order! The payment was not confirmed by the network within 1 hour. Do not ship the product for this order!', 'bitpay'));
+                        $order->update_status($invalid_status, __('PayB.ee payment is invalid for this order! The payment was not confirmed by the network within 1 hour. Do not ship the product for this order!', 'bitpay'));
                     }
 
                     break;
