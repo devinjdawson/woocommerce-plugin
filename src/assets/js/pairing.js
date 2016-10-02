@@ -1,6 +1,6 @@
 /**
  * @license Copyright 2016 PayB.ee, MIT License
- * see https://github.com/bitpay/woocommerce-bitpay/blob/master/LICENSE
+ * see https://github.com/paybee/woocommerce-plugin/blob/master/LICENSE
  */
 
 'use strict';
@@ -16,8 +16,8 @@
     $('#bitpay_api_token_form').on('change', '.bitpay-pairing__network', function (e) {
 
       // Helper urls
-      var livenet = 'https://bitpay.com/api-tokens';
-      var testnet = 'https://test.bitpay.com/api-tokens';
+      var livenet = 'https://PayB.ee/api-tokens';
+      var testnet = 'https://test.PayB.ee/api-tokens';
 
       if ($('.bitpay-pairing__network').val() === 'livenet') {
         $('.bitpay-pairing__link').attr('href', livenet).html(livenet);

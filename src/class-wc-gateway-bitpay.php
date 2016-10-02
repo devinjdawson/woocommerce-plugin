@@ -6,7 +6,7 @@
     Author:      PayBee
     Author URI:  https://PayB.ee
 
-    Version:           2.2.9
+    Version:           .1
     License:           Copyright 2016 PayB.ee, MIT License
     License URI:       https://github.com/paybee/woocommerce-plugin/blob/master/LICENSE
     GitHub Plugin URI: https://github.com/paybee/woocommerce-plugin
